@@ -3,139 +3,162 @@
 <head>
 
   <script>
-    function reqListener() {
-      const obj = JSON.parse(this.responseText);
+    //DataHandler region
+    function GetWebpageData(data, forecast) {
+      
+      let place = data[0].place;
 
-      const latest = document.getElementById("latest");
-      CreateTable(latest);
-      addData(latest, obj[obj.length - 1]);
+      let measurement = data[data.length - 1];
+      let temperature = GetTemperature(data);
+      let precipitation = TotalPrecipitation(data);
+      let wind = GetWind(data);
+      let cover = GetCloudCoverage(data);
+      let predictions = GetPredictions(forecast);
 
-      const minimum = document.getElementById("minimum");
-
-      let lowestTemps = new Array();
-      lowestTemps.push(findLowestTemprture("Horsens", obj));
-      lowestTemps.push(findLowestTemprture("Aarhus", obj));
-      lowestTemps.push(findLowestTemprture("Copenhagen", obj));
-
-      lowestTemps.forEach(data => {
-        var newRow = document.createElement("tr");
-
-        var cityCell = document.createElement("td");
-        cityCell.innerHTML = data.palce;
-        newRow.append(cityCell);
-
-        var valueCell = document.createElement("td");
-        valueCell.innerHTML = data.lowest;
-        newRow.append(valueCell);
-
-        minimum.appendChild(newRow);
-      });
-
-      const maximun = document.getElementById("maximun");
-
-      let highestTemps = new Array();
-      highestTemps.push(findHighestTemprture("Horsens", obj));
-      highestTemps.push(findHighestTemprture("Aarhus", obj));
-      highestTemps.push(findHighestTemprture("Copenhagen", obj));
-
-      highestTemps.forEach(data => {
-        var newRow = document.createElement("tr");
-
-        var cityCell = document.createElement("td");
-        cityCell.innerHTML = data.palce;
-        newRow.append(cityCell);
-
-        var valueCell = document.createElement("td");
-        valueCell.innerHTML = data.highest;
-        newRow.append(valueCell);
-
-        maximun.appendChild(newRow);
-      });
-
-      const Precipitation = document.getElementById("precipitation");
-
-      let totals = new Array();
-      totals.push(TotalPrecipitation("Horsens", obj));
-      totals.push(TotalPrecipitation("Aarhus", obj));
-      totals.push(TotalPrecipitation("Copenhagen", obj));
-
-      totals.forEach(data => {
-        var newRow = document.createElement("tr");
-
-        var cityCell = document.createElement("td");
-        cityCell.innerHTML = data.palce;
-        newRow.append(cityCell);
-
-        var valueCell = document.createElement("td");
-        valueCell.innerHTML = data.amonut;
-        newRow.append(valueCell);
-
-        Precipitation.appendChild(newRow);
-      });
-
-      const table = document.getElementById("weather-table");
-      CreateTable(table);
-
-      obj.forEach(value => {
-        addData(table, value);
-      });
+      return { place, measurement, temperature, precipitation, wind, cover, predictions }
     }
 
-    function addData(element, obj) {
-      var newRow = document.createElement("tr");
+    function CreateTable(table, type) {
 
-      var valueCell = document.createElement("td");
-      valueCell.innerHTML = obj.value;
-      newRow.append(valueCell);
+      switch (type) {
+        case 1:
+          var newRow = document.createElement("tr");
 
-      var unitCell = document.createElement("td");
-      unitCell.innerHTML = obj.unit;
-      newRow.append(unitCell);
+          var valueCell = document.createElement("td");
+          valueCell.innerHTML = "Value";
+          newRow.append(valueCell);
 
-      var typeCell = document.createElement("td");
-      typeCell.innerHTML = obj.type;
-      newRow.append(typeCell);
+          var unitCell = document.createElement("td");
+          unitCell.innerHTML = "Unit";
+          newRow.append(unitCell);
 
-      var timeCell = document.createElement("td");
-      timeCell.innerHTML = obj.time;
-      newRow.append(timeCell);
+          var typeCell = document.createElement("td");
+          typeCell.innerHTML = "type";
+          newRow.append(typeCell);
 
-      var placeCell = document.createElement("td");
-      placeCell.innerHTML = obj.place;
-      newRow.append(placeCell);
+          var timeCell = document.createElement("td");
+          timeCell.innerHTML = "time";
+          newRow.append(timeCell);
 
-      element.appendChild(newRow);
+          var placeCell = document.createElement("td");
+          placeCell.innerHTML = "place";
+          newRow.append(placeCell);
+
+          table.appendChild(newRow);
+          break;
+
+        case 2:
+          {
+            const typeRow = document.createElement("tr");
+
+            const minCell = document.createElement("td");
+            minCell.innerHTML = "min";
+            typeRow.append(minCell);
+
+            const maxCell = document.createElement("td");
+            maxCell.innerHTML = "max";
+            typeRow.append(maxCell);
+
+            table.append(typeRow);
+          }
+          break;
+
+        case 3:
+          {
+            const typeRow = document.createElement("tr");
+
+            const cell = document.createElement("td");
+            cell.innerHTML = "Amount";
+            typeRow.append(cell);
+
+            table.append(typeRow);
+          }
+          break;
+
+        case 4:
+          {
+            const typeRow = document.createElement("tr");
+
+            const speedCell = document.createElement("td");
+            speedCell.innerHTML = "Speed";
+            typeRow.append(speedCell);
+
+            const directionCell = document.createElement("td");
+            directionCell.innerHTML = "Direction";
+            typeRow.append(directionCell);
+
+            table.append(typeRow);
+          }
+          break;
+
+        case 5:
+          {
+            const typeRow = document.createElement("tr");
+
+            const cloudCell = document.createElement("td");
+            cloudCell.innerHTML = "Cloud coverage";
+            typeRow.append(cloudCell);
+
+            table.append(typeRow);
+          }
+          break;
+
+        case 6:
+          {
+            const typeRow = document.createElement("tr");
+
+            const timeCell = document.createElement("td");
+            timeCell.innerHTML = "Time";
+            typeRow.append(timeCell);
+
+            const tfCell = document.createElement("td");
+            tfCell.innerHTML = "temperature from";
+            typeRow.append(tfCell);
+
+            const ttCell = document.createElement("td");
+            ttCell.innerHTML = "temperature to";
+            typeRow.append(ttCell);
+
+            const pfCell = document.createElement("td");
+            pfCell.innerHTML = "precipitation from";
+            typeRow.append(pfCell);
+
+            const ptCell = document.createElement("td");
+            ptCell.innerHTML = "precipitation to";
+            typeRow.append(ptCell);
+
+            const wsfCell = document.createElement("td");
+            wsfCell.innerHTML = "wind speed from";
+            typeRow.append(wsfCell);
+
+            const wstCell = document.createElement("td");
+            wstCell.innerHTML = "wind speed to";
+            typeRow.append(wstCell);
+
+            const ccfCell = document.createElement("td");
+            ccfCell.innerHTML = "cloud coverage from";
+            typeRow.append(ccfCell);
+
+            const cctCell = document.createElement("td");
+            cctCell.innerHTML = "cloud coverage to";
+            typeRow.append(cctCell);
+
+            table.append(typeRow);
+          }
+          break;
+      }
+
     }
 
-    function CreateTable(table) {
-      var newRow = document.createElement("tr");
+    function GetTemperature(data) {
+      const low = FindLowestTemprture(data);
+      const high = FindHighestTemprture(data);
 
-      var valueCell = document.createElement("td");
-      valueCell.innerHTML = "Value";
-      newRow.append(valueCell);
-
-      var unitCell = document.createElement("td");
-      unitCell.innerHTML = "Unit";
-      newRow.append(unitCell);
-
-      var typeCell = document.createElement("td");
-      typeCell.innerHTML = "type";
-      newRow.append(typeCell);
-
-      var timeCell = document.createElement("td");
-      timeCell.innerHTML = "time";
-      newRow.append(timeCell);
-
-      var placeCell = document.createElement("td");
-      placeCell.innerHTML = "place";
-      newRow.append(placeCell);
-
-      table.appendChild(newRow);
-
+      return { low, high }
     }
 
-    function findLowestTemprture(palce, obj) {
-      const result = obj.filter(data => data.type == "temperature" && data.place == palce
+    function FindLowestTemprture(obj) {
+      const result = obj.filter(data => data.type == "temperature"
         && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
           || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
           || data.time.split("T")[0].includes("04")));
@@ -147,11 +170,11 @@
         }
       });
 
-      return { palce, lowest }
+      return lowest
     }
 
-    function findHighestTemprture(palce, obj) {
-      const result = obj.filter(data => data.type == "temperature" && data.place == palce
+    function FindHighestTemprture(obj) {
+      const result = obj.filter(data => data.type == "temperature"
         && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
           || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
           || data.time.split("T")[0].includes("04")));
@@ -163,50 +186,366 @@
         }
       });
 
-      return { palce, highest }
+      return highest
     }
 
-    function TotalPrecipitation(palce, obj) {
-      const result = obj.filter(data => data.type == "precipitation" && data.place == palce
+    function TotalPrecipitation(obj) {
+      const result = obj.filter(data => data.type == "precipitation"
         && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
           || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
           || data.time.split("T")[0].includes("04")));
-      let amonut = 0;
+      let amount = 0;
 
       result.forEach(data => {
-        amonut += data.value;
+        amount += data.value;
       });
 
-      return { palce, amonut }
+      return { amount }
     }
 
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", reqListener);
-    oReq.open("GET", "http://localhost:8080/data");
-    oReq.send();
+    function GetWind(obj) {
+      const result = obj.filter(data => data.type == "wind speed"
+        && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
+          || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
+          || data.time.split("T")[0].includes("04")));
+      let amount = 0;
+
+      result.forEach(data => {
+        amount += data.value;
+      });
+
+      amount = amount / result.length;
+
+      direction = DominantWindDirection(result);
+
+      return { amount, direction }
+    }
+
+    function DominantWindDirection(obj) {
+      diractions = GetWindDirections(obj);
+
+      let currentLength = 0;
+      let dominant;
+
+      diractions.forEach(x => {
+        if (x.length > currentLength) {
+          currentLength = x.length;
+          dominant = x[0].direction;
+        }
+      });
+
+
+      return dominant;
+    }
+
+    function GetWindDirections(data) {
+      let dir = new Array();
+      const n = data.filter(x => x.direction == "North");
+      dir.push(n);
+
+      const s = data.filter(x => x.direction == "South");
+      dir.push(s);
+
+      const e = data.filter(x => x.direction == "East");
+      dir.push(e);
+
+      const w = data.filter(x => x.direction == "West");
+      dir.push(w);
+
+      const ne = data.filter(x => x.direction == "Northeast");
+      dir.push(ne);
+
+      const nw = data.filter(x => x.direction == "Northwest");
+      dir.push(nw);
+
+      const se = data.filter(x => x.direction == "Southeast");
+      dir.push(se);
+
+      const sw = data.filter(x => x.direction == "Southwest");
+      dir.push(sw);
+
+      return dir
+    }
+
+    function GetCloudCoverage(obj) {
+      const result = obj.filter(data => data.type == "cloud coverage"
+        && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
+          || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
+          || data.time.split("T")[0].includes("04")));
+
+      let amount = 0;
+
+      result.forEach(data => {
+        amount += data.value;
+      });
+
+      amount = amount / result.length;
+
+      return { amount };
+    }
+
+    function GetPredictions(obj) {
+      const temperature = obj.filter(x => x.type == "temperature");
+      const precipitation = obj.filter(x => x.type == "precipitation");
+      const windSpeed = obj.filter(x => x.type == "wind speed");
+      const cloudCoverage = obj.filter(x => x.type == "cloud coverage");
+      const time = [];
+
+      let predictions = [];
+
+      for (let index = 0; index < temperature.length; index++) {
+        const t = temperature[index].time.split('T')[1].split(':')[0];
+        time.push(t);
+      }
+
+      return { time, temperature, precipitation, windSpeed, cloudCoverage }
+    }
+    //Build region
+    function BuildWebpage(data) {
+      const place = document.createElement("h1");
+      place.innerHTML = data.place;
+      document.body.append(place);
+
+      const measurement = BuildMeasurement(data.measurement);
+      document.body.append(measurement);
+
+      const temperature = BuildTemperature(data.temperature)
+      document.body.append(temperature);
+
+      const precipitation = BuildPrecipitation(data.precipitation)
+      document.body.append(precipitation);
+
+      const wind = BuildWind(data.wind)
+      document.body.append(wind);
+
+      const cover = BuildCover(data.cover)
+      document.body.append(cover);
+
+      const predictions = BuildPredictions(data.predictions)
+      document.body.append(predictions);
+    }
+
+    function BuildMeasurement(measurement) {
+      const table = document.createElement("table");
+
+      CreateTable(table, 1);
+
+      var newRow = document.createElement("tr");
+
+      var valueCell = document.createElement("td");
+      valueCell.innerHTML = measurement.value;
+      newRow.append(valueCell);
+
+      var unitCell = document.createElement("td");
+      unitCell.innerHTML = measurement.unit;
+      newRow.append(unitCell);
+
+      var typeCell = document.createElement("td");
+      typeCell.innerHTML = measurement.type;
+      newRow.append(typeCell);
+
+      var timeCell = document.createElement("td");
+      timeCell.innerHTML = measurement.time;
+      newRow.append(timeCell);
+
+      var placeCell = document.createElement("td");
+      placeCell.innerHTML = measurement.place;
+      newRow.append(placeCell);
+
+      table.append(newRow);
+
+      return table;
+    }
+
+    function BuildTemperature(temperature) {
+      const table = document.createElement("table");
+
+      CreateTable(table, 2);
+
+      const valuesRow = document.createElement("tr");
+
+      const minCell = document.createElement("td");
+      minCell.innerHTML = temperature.low;
+      valuesRow.append(minCell);
+
+      const maxCell = document.createElement("td");
+      maxCell.innerHTML = temperature.high;
+      valuesRow.append(maxCell);
+
+      table.append(valuesRow);
+
+      return table;
+    }
+
+    function BuildPrecipitation(precipitation) {
+      const table = document.createElement("table");
+
+      CreateTable(table, 3);
+
+      const valuesRow = document.createElement("tr");
+
+      const cell = document.createElement("td");
+      cell.innerHTML = precipitation.amount;
+      valuesRow.append(cell);
+
+      table.append(valuesRow);
+
+      return table;
+    }
+
+    function BuildWind(wind) {
+      const table = document.createElement("table");
+
+      CreateTable(table, 4);
+
+      const valuesRow = document.createElement("tr");
+
+      const speedCell = document.createElement("td");
+      speedCell.innerHTML = wind.amount;
+      valuesRow.append(speedCell);
+
+      const dirCell = document.createElement("td");
+      dirCell.innerHTML = wind.direction;
+      valuesRow.append(dirCell);
+
+      table.append(valuesRow);
+
+      return table
+    }
+
+    function BuildCover(cover) {
+      const table = document.createElement("table");
+
+      CreateTable(table, 5);
+
+      const valuesRow = document.createElement("tr");
+
+      const speedCell = document.createElement("td");
+      speedCell.innerHTML = cover.amount;
+      valuesRow.append(speedCell);
+
+      table.append(valuesRow);
+
+      return table
+    }
+
+    function BuildPredictions(predictions) {
+      const table = document.createElement("table");
+
+      CreateTable(table, 6);
+
+      for (let i = 0; i < predictions.time.length; i++) {
+        const time = predictions.time[i];
+        const temp = predictions.temperature[i];
+        const prec = predictions.precipitation[i];
+        const wind = predictions.windSpeed[i];
+        const cloud = predictions.cloudCoverage[i];
+
+        let valuesRow = document.createElement("tr");
+
+        let Cell = document.createElement("td");
+        Cell.innerHTML = time;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = temp.from;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = temp.to;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = prec.from;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = prec.to;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = wind.from;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = wind.to;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = cloud.from;
+        valuesRow.append(Cell);
+
+        Cell = document.createElement("td");
+        Cell.innerHTML = cloud.to;
+        valuesRow.append(Cell);
+
+
+        table.append(valuesRow);
+
+      }
+      return table
+    }
+
+    function MyXMLHttp() {
+      let data, forecast;
+
+      let dataRequest = new XMLHttpRequest();
+      dataRequest.open("GET", "http://localhost:8080/data/Horsens");
+
+      let forecastRequest = new XMLHttpRequest();
+      forecastRequest.open("GET", "http://localhost:8080/forecast/Horsens");
+
+      dataRequest.onreadystatechange = function() {
+        if (dataRequest.readyState === XMLHttpRequest.DONE && dataRequest.status === 200) {
+            data = JSON.parse(dataRequest.responseText);
+          }
+      }
+      forecastRequest.onreadystatechange = function () {
+        if (forecastRequest.readyState === XMLHttpRequest.DONE && forecastRequest.status === 200) {
+            forecast = JSON.parse(forecastRequest.responseText);
+          }
+      }
+
+      dataRequest.onload = function() {
+        //console.log({data, forecast})
+        const webpageData = GetWebpageData(data, forecast)
+
+        BuildWebpage(webpageData);
+      }
+
+      forecastRequest.send();
+      dataRequest.send();
+    }
+
+    function Fetch() {
+      places = ["Aarhus", "Copenhagen"]
+
+      places.forEach(async function (place) {
+        let data = await fetch("http://localhost:8080/data/" + place);
+        let forecast = await fetch("http://localhost:8080/forecast/" + place);
+
+        if (data.ok && forecast.ok) { // if HTTP-status is 200-299
+          // get the response body (the method explained below)
+          let dataJson = await data.json();
+          let forecastJson = await forecast.json();
+
+          const webpageData = GetWebpageData(dataJson, forecastJson)
+
+          BuildWebpage(webpageData);
+        } else {
+          alert("HTTP-Error: " + data.status);
+          alert("HTTP-Error: " + forecast.status);
+        }
+      });
+    }
+
+    MyXMLHttp();
+    Fetch();
   </script>
 
 </head>
 
 <body>
-  <h1>Weather</h1>
-
-  <h2>latest measuremen</h2>
-  <table id="latest"></table>
-
-  <h2>Minimum temperature</h2>
-  <table id="minimum"></table>
-
-  <h2>Maximun temperature</h2>
-  <table id="maximun"></table>
-
-  <h2>Total precipitation</h2>
-  <table id="precipitation"></table>
-
-
-  <table id="weather-table">
-
-  </table>
 </body>
 
 </html>
