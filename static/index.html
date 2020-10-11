@@ -1,8 +1,212 @@
 <html>
-  <head>
 
-  </head>
-  <body>
-    
-  </body>
+<head>
+
+  <script>
+    function reqListener() {
+      const obj = JSON.parse(this.responseText);
+
+      const latest = document.getElementById("latest");
+      CreateTable(latest);
+      addData(latest, obj[obj.length - 1]);
+
+      const minimum = document.getElementById("minimum");
+
+      let lowestTemps = new Array();
+      lowestTemps.push(findLowestTemprture("Horsens", obj));
+      lowestTemps.push(findLowestTemprture("Aarhus", obj));
+      lowestTemps.push(findLowestTemprture("Copenhagen", obj));
+
+      lowestTemps.forEach(data => {
+        var newRow = document.createElement("tr");
+
+        var cityCell = document.createElement("td");
+        cityCell.innerHTML = data.palce;
+        newRow.append(cityCell);
+
+        var valueCell = document.createElement("td");
+        valueCell.innerHTML = data.lowest;
+        newRow.append(valueCell);
+
+        minimum.appendChild(newRow);
+      });
+
+      const maximun = document.getElementById("maximun");
+
+      let highestTemps = new Array();
+      highestTemps.push(findHighestTemprture("Horsens", obj));
+      highestTemps.push(findHighestTemprture("Aarhus", obj));
+      highestTemps.push(findHighestTemprture("Copenhagen", obj));
+
+      highestTemps.forEach(data => {
+        var newRow = document.createElement("tr");
+
+        var cityCell = document.createElement("td");
+        cityCell.innerHTML = data.palce;
+        newRow.append(cityCell);
+
+        var valueCell = document.createElement("td");
+        valueCell.innerHTML = data.highest;
+        newRow.append(valueCell);
+
+        maximun.appendChild(newRow);
+      });
+
+      const Precipitation = document.getElementById("precipitation");
+
+      let totals = new Array();
+      totals.push(TotalPrecipitation("Horsens", obj));
+      totals.push(TotalPrecipitation("Aarhus", obj));
+      totals.push(TotalPrecipitation("Copenhagen", obj));
+
+      totals.forEach(data => {
+        var newRow = document.createElement("tr");
+
+        var cityCell = document.createElement("td");
+        cityCell.innerHTML = data.palce;
+        newRow.append(cityCell);
+
+        var valueCell = document.createElement("td");
+        valueCell.innerHTML = data.amonut;
+        newRow.append(valueCell);
+
+        Precipitation.appendChild(newRow);
+      });
+
+      const table = document.getElementById("weather-table");
+      CreateTable(table);
+
+      obj.forEach(value => {
+        addData(table, value);
+      });
+    }
+
+    function addData(element, obj) {
+      var newRow = document.createElement("tr");
+
+      var valueCell = document.createElement("td");
+      valueCell.innerHTML = obj.value;
+      newRow.append(valueCell);
+
+      var unitCell = document.createElement("td");
+      unitCell.innerHTML = obj.unit;
+      newRow.append(unitCell);
+
+      var typeCell = document.createElement("td");
+      typeCell.innerHTML = obj.type;
+      newRow.append(typeCell);
+
+      var timeCell = document.createElement("td");
+      timeCell.innerHTML = obj.time;
+      newRow.append(timeCell);
+
+      var placeCell = document.createElement("td");
+      placeCell.innerHTML = obj.place;
+      newRow.append(placeCell);
+
+      element.appendChild(newRow);
+    }
+
+    function CreateTable(table) {
+      var newRow = document.createElement("tr");
+
+      var valueCell = document.createElement("td");
+      valueCell.innerHTML = "Value";
+      newRow.append(valueCell);
+
+      var unitCell = document.createElement("td");
+      unitCell.innerHTML = "Unit";
+      newRow.append(unitCell);
+
+      var typeCell = document.createElement("td");
+      typeCell.innerHTML = "type";
+      newRow.append(typeCell);
+
+      var timeCell = document.createElement("td");
+      timeCell.innerHTML = "time";
+      newRow.append(timeCell);
+
+      var placeCell = document.createElement("td");
+      placeCell.innerHTML = "place";
+      newRow.append(placeCell);
+
+      table.appendChild(newRow);
+
+    }
+
+    function findLowestTemprture(palce, obj) {
+      const result = obj.filter(data => data.type == "temperature" && data.place == palce
+        && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
+          || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
+          || data.time.split("T")[0].includes("04")));
+      let lowest = 9999999999999999;
+
+      result.forEach(data => {
+        if (data.value < lowest) {
+          lowest = data.value
+        }
+      });
+
+      return { palce, lowest }
+    }
+
+    function findHighestTemprture(palce, obj) {
+      const result = obj.filter(data => data.type == "temperature" && data.place == palce
+        && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
+          || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
+          || data.time.split("T")[0].includes("04")));
+      let highest = -9999999999999999;
+
+      result.forEach(data => {
+        if (data.value > highest) {
+          highest = data.value
+        }
+      });
+
+      return { palce, highest }
+    }
+
+    function TotalPrecipitation(palce, obj) {
+      const result = obj.filter(data => data.type == "precipitation" && data.place == palce
+        && (data.time.split("T")[0].includes("08") || data.time.split("T")[0].includes("07")
+          || data.time.split("T")[0].includes("06") || data.time.split("T")[0].includes("05")
+          || data.time.split("T")[0].includes("04")));
+      let amonut = 0;
+
+      result.forEach(data => {
+        amonut += data.value;
+      });
+
+      return { palce, amonut }
+    }
+
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", reqListener);
+    oReq.open("GET", "http://localhost:8080/data");
+    oReq.send();
+  </script>
+
+</head>
+
+<body>
+  <h1>Weather</h1>
+
+  <h2>latest measuremen</h2>
+  <table id="latest"></table>
+
+  <h2>Minimum temperature</h2>
+  <table id="minimum"></table>
+
+  <h2>Maximun temperature</h2>
+  <table id="maximun"></table>
+
+  <h2>Total precipitation</h2>
+  <table id="precipitation"></table>
+
+
+  <table id="weather-table">
+
+  </table>
+</body>
+
 </html>
