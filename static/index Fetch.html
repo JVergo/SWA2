@@ -5,7 +5,7 @@
   <script>
     //DataHandler region
     function GetWebpageData(data, forecast) {
-
+      
       let place = data[0].place;
 
       let measurement = data[data.length - 1];
@@ -486,42 +486,28 @@
       return table
     }
 
-    function MyXMLHttp() {
-      let data, forecast;
-      places = ["Aarhus", "Copenhagen", "Horsens"];
+    function Fetch() {
+      places = ["Horsens", "Aarhus", "Copenhagen"]
 
       places.forEach(async function (place) {
+        let data = await fetch("http://localhost:8080/data/" + place);
+        let forecast = await fetch("http://localhost:8080/forecast/" + place);
 
-        let dataRequest = new XMLHttpRequest();
-        dataRequest.open("GET", "http://localhost:8080/data/" + place);
+        if (data.ok && forecast.ok) { // if HTTP-status is 200-299
+          // get the response body (the method explained below)
+          let dataJson = await data.json();
+          let forecastJson = await forecast.json();
 
-        let forecastRequest = new XMLHttpRequest();
-        forecastRequest.open("GET", "http://localhost:8080/forecast/" + place);
-
-        dataRequest.onreadystatechange = function () {
-          if (dataRequest.readyState === XMLHttpRequest.DONE && dataRequest.status === 200) {
-            data = JSON.parse(dataRequest.responseText);
-          }
-        }
-        forecastRequest.onreadystatechange = function () {
-          if (forecastRequest.readyState === XMLHttpRequest.DONE && forecastRequest.status === 200) {
-            forecast = JSON.parse(forecastRequest.responseText);
-          }
-        }
-
-        dataRequest.onload = function () {
-          //console.log({data, forecast})
-          const webpageData = GetWebpageData(data, forecast)
+          const webpageData = GetWebpageData(dataJson, forecastJson)
 
           BuildWebpage(webpageData);
+        } else {
+          alert("HTTP-Error: " + data.status);
+          alert("HTTP-Error: " + forecast.status);
         }
-
-        forecastRequest.send();
-        dataRequest.send();
       });
     }
-
-    MyXMLHttp();
+    Fetch();
   </script>
 
 </head>
