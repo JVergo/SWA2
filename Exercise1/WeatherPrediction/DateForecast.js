@@ -47,65 +47,73 @@ class WeatherForecast
     {
         this.weatherPrediction = _weatherPrediction
         //array of weatherPredictions
-        //where should the weatherPrediction array be declared in a class context?
     }
 
-    getWeatherForecast() { return this.weatherPrediction}  // works
-    addWeatherPrediction(data) { this.weatherPrediction.push(data) } // works
-    getObject() { return this }
+    getWeatherForecast() { return this.weatherPrediction}  
+    addWeatherPrediction(data) { this.weatherPrediction.push(data) } 
 
-    includesData(data) // doesn't work the way i thought it would
+    includesData(data) 
     {
-        //const includes = this.weatherPrediction.filter(prediction => prediction.data == data);
-        const includes = this.weatherPrediction.filter((prediction) => prediction.data == data)
-        return includes;
+        //const filterData = this.weatherPrediction.filter(prediction => )
         //use filter to find a single weatherPrediction within the weatherForecast array
     }
 
-    //are these 3 methods for getting or setting a place, type and period respectively?
-    //return the forecast per these defined places, types and/or periods?
-    forPlace(place)
+    //return the forecast per these defined places, types and/or periods
+    forPlace(place) // works
     {
-        const places = this.weatherPrediction.filter(prediction => prediction.place);
-        //i don't think this is quite correct
+        const filteredPlaces = this.weatherPrediction.filter(prediction => prediction.place == place)
+        return filteredPlaces
     }
     forType(type)
     {
-
+        const filteredTypes = this.weatherPrediction.filter(prediction => prediction.type == type)
+        return filteredTypes
     }
-    forPeriod(period)
+    forPeriod(periodStart, periodEnd)
     {
-        // map function?
+        // try using date interval contains 
+        const filteredPeriod = this.weatherPrediction.filter(prediction => 
+            prediction.time >= periodStart && prediction.time <= periodEnd)
+        return filteredPeriod
     }
 
     convertToUsUnits()
     {
-        //use filter to convert every unit of from and to into international units
+        //use map to convert every unit of from and to into international units
+        const convertedArray = this.weatherPrediction.map((obj, p) =>
+            {
+                switch (p)
+                {
+                    case "CELSIUS":
+                        obj.convertToFahrenheit  // how to access this method?
+                        break;
+                    case "MM":
+                        break;
+                    case "MS":
+                        break;
+                    default:
+                        break;
+                }
+                return convertedArray
+            })
     }
     convertToMetricUnits()
     {
-        //use filter to convert every unit of from and to into metric units
+        //use map to convert every unit of from and to into metric units
     }
 
-    averageFromValue()
+    averageFromValue() // can't get the from value?
     {
         //use reduce to gather all from values in the weatherForecast array and return the result
-        //const fromNums = this.weatherPrediction.filter(prediction => prediction.fromNum);
-        //const reducer = (average, prediction, _, { length }) => average + prediction.fromNum / length;
-        //return this.weatherPrediction.reduce(reducer);
-
-        const average = this.weatherPrediction.reduce((avg, prediction) => 
-            avg + prediction.getFrom(), 0) / this.weatherPrediction.length;
-        return average;
-        //return fromNums  //why am i getting the whole object?
-        //why are the return values not being stored and returned?  array?
+        const reduceFrom = (sum, fromValue) => (sum + fromValue.fromNum) / this.weatherPrediction.length
+        const average = this.weatherPrediction.reduce(reduceFrom)
+        return average
     }
     averageToValue()
     {
         //use reduce to gather all to values in the weatherForecast array and return the result
-        //correction, i need to use filter then 
-        const reducer = (average, to, _, { length }) => average + to / length;
-        return toNums.reduce(reducer);
+        const reduceTo = (average, to, _, { length }) => average + to.toNum / length;
+        return this.weatherPrediction.reduce(reduceTo);
     }
 
     //Testing Purposes
@@ -118,7 +126,6 @@ var prediction3 = new WeatherPrediction("MS", "Wind", "Copenhagen", null, 3, 6)
 var forecast = new WeatherForecast([prediction1, prediction2])
 //console.log(forecast.toString())
 forecast.addWeatherPrediction(prediction3)
-//console.log(forecast.getWeatherForecast())
-//console.log(forecast.getObject())
-//console.log(forecast.includesData(unit))  // how to pass in user-defined value?
-console.log(forecast.averageFromValue())  // returning false?
+console.log(forecast.getWeatherForecast())
+console.log(forecast.forPlace("Copenhagen"))
+//console.log(forecast.averageFromValue()) returns NaN
