@@ -19,13 +19,14 @@ class ImmutableEvent {
     toString() { return `Place: ${this.getPlace()}, Time - ${this.getTime()}` }
 }
 var myEvent = new ImmutableEvent('Horsens', null);
-console.log('TEST IMMUTABLE EVENT');
-console.log('Data Must Change');
+console.log('!!! TEST IMMUTABLE EVENT');
+console.log('!!! Place Must Change');
 console.log(myEvent.toString());
 var secondEvent = myEvent.setPlace('USA');
 console.log(secondEvent.toString());
-console.log('Data Must Remain The Same');
+console.log('!!! Time and Place Must Remain The Same');
 console.log(myEvent.toString());
+myEvent.place = "NEW FORCED PLACE";
 myEvent.time = new Date(11111).toLocaleString();
 console.log(myEvent.toString());
 
@@ -50,13 +51,13 @@ class ImmutableDataType extends ImmutableEvent {
 }
 var myDataType = new ImmutableDataType('testUnit', 'testType', 'testPlace', null);
 console.log()
-console.log('TEST IMMUTABLE DATA TYPE');
-console.log('Data Must Change');
+console.log('!!! TEST IMMUTABLE DATA TYPE');
+console.log('!!! Data Must Change');
 console.log(myDataType.toString());
 var secondData = myDataType.setUnit('UNIT_CHANGED');
 var thirdData = secondData.setType('TYPE_CHANGED');
 console.log(thirdData.toString());
-console.log('Data Must Remain The Same');
+console.log('!!! Data Must Remain The Same');
 console.log(myDataType.toString());
 myDataType.type = "MANUALLY FORCED TYPE";
 console.log(myDataType.toString());
@@ -79,15 +80,14 @@ class ImmutableWeatherData extends ImmutableDataType {
 }
 var myWeatherData = new ImmutableWeatherData(1, 'testUnit', 'testType', 'testPlace', null);
 console.log()
-console.log('TEST IMMUTABLE WEATHER DATA');
-console.log('Data Must Change');
+console.log('!!! TEST IMMUTABLE WEATHER DATA');
+console.log('Value Must Change');
 console.log(myWeatherData.toString());
-var secondData = myWeatherData.setUnit('UNIT_CHANGED');
-var thirdData = secondData.setType('TYPE_CHANGED');
-console.log(thirdData.toString());
-console.log('Data Must Remain The Same');
+secondData = myWeatherData.setValue(222);
+console.log(secondData.toString());
+console.log('!!! Value Must Remain The Same');
 console.log(myWeatherData.toString());
-myWeatherData.type = "MANUALLY FORCED TYPE";
+myWeatherData.value = "MANUALLY FORCED VALUE";
 console.log(myWeatherData.toString());
 
 module.exports = ImmutableWeatherData;
