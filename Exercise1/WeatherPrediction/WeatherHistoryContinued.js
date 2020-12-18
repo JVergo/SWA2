@@ -112,7 +112,7 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
     convertToInches() {
         if (this.unit == 'MM') {
             return new ImmutablePrecipitation(
-                (this.value / 25.4),
+                (this.value * 0.0393701),
                 'IN',
                 this.type,
                 this.place,
@@ -132,7 +132,7 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
     convertToMM() {
         if (this.unit == 'IN') {
             return new ImmutablePrecipitation(
-                (this.value * 0.0393701),
+                (this.value / 0.0393701),
                 'MM',
                 this.type,
                 this.place,
@@ -311,15 +311,15 @@ class ImmutableWeatherHistory {
 
     convertToUSUnits() {
         return new ImmutableWeatherHistory(
-            myMap(this.immutableWeatherDataArr, (w) => {
-                if (w.type == 'MS' || w.type == 'MPH')
-                    w.convertToMPH();
+            myMap(...this.immutableWeatherDataArr, (w) => {
+                if (w.unit == 'MS' || w.unit == 'MPH')
+                    return w.convertToMPH();
                 // else if (w.type == '%')
                 //     w
-                else if (w.type == 'MM' || w.type == 'IN')
-                    w.convertToInches();
-                else if (w.type == 'celsius' || w.type == 'fahrenheit')
-                    w.convertToF();
+                else if (w.unit == 'MM' || w.unit == 'IN')
+                    return w.convertToInches();
+                else if (w.unit == 'celsius' || w.unit == 'fahrenheit')
+                    return w.convertToF();
                 else return w
             })
         );
@@ -328,14 +328,14 @@ class ImmutableWeatherHistory {
     convertToInternationalUnits() {
         return new ImmutableWeatherHistory(
             myMap(...this.immutableWeatherDataArr, (w) => {
-                if (w.type == 'MS' || w.type == 'MPH')
-                    w.convertToMS();
+                if (w.unit == 'MS' || w.unit == 'MPH')
+                    return w.convertToMS();
                 // else if (w.type == '%')
                 //     w
-                else if (w.type == 'MM' || w.type == 'IN')
-                    w.convertToMM();
-                else if (w.type == 'celsius' || w.type == 'fahrenheit')
-                    w.convertToC();
+                else if (w.unit == 'MM' || w.unit == 'IN')
+                    return w.convertToMM();
+                else if (w.unit == 'celsius' || w.unit == 'fahrenheit')
+                    return w.convertToC();
                 else return w
             })
         );
@@ -344,7 +344,7 @@ class ImmutableWeatherHistory {
     lowestWindValue() {
         let min;
 
-        myFilter(this.immutableWeatherDataArr, (w) => (
+        myFilter(...this.immutableWeatherDataArr, (w) => (
             w.unit == "MS" || w.unit == "MPH")
             ? w : null
         ).forEach(filteredElement => {
@@ -372,7 +372,7 @@ class ImmutableWeatherHistory {
     lowestTemperatureValue() {
         let min;
 
-        myFilter(this.immutableWeatherDataArr, (w) => (
+        myFilter(...this.immutableWeatherDataArr, (w) => (
             w.unit == "fahrenheit" || w.unit == "celsius")
             ? w : null
         ).forEach(filteredElement => {
@@ -386,7 +386,7 @@ class ImmutableWeatherHistory {
     lowestCloudCoverageValue() {
         let min;
 
-        myFilter(this.immutableWeatherDataArr, (w) => (
+        myFilter(...this.immutableWeatherDataArr, (w) => (
             w.unit == "\%")
             ? w : null
         ).forEach(filteredElement => {
@@ -400,7 +400,7 @@ class ImmutableWeatherHistory {
     latestWindData() {
         let windData;
 
-        myFilter(this.immutableWeatherDataArr, (w) => (
+        myFilter(...this.immutableWeatherDataArr, (w) => (
             w.unit == "MS" || w.unit == "MPH")
             ? w : null
         ).forEach(filteredElement => {
@@ -414,7 +414,7 @@ class ImmutableWeatherHistory {
     latestPrecipitationData() {
         let precipitationData;
 
-        myFilter(this.immutableWeatherDataArr, (w) => (
+        myFilter(...this.immutableWeatherDataArr, (w) => (
             w.unit == "MM" || w.unit == "IN")
             ? w : null
         ).forEach(filteredElement => {
@@ -443,7 +443,7 @@ class ImmutableWeatherHistory {
         let cloudCoverageData;
 
         // GENERATING FILTERED ARRAY
-        myFilter(this.immutableWeatherDataArr, (w) => (
+        myFilter(...this.immutableWeatherDataArr, (w) => (
             w.unit == "\%")
             ? w : null
         )
@@ -470,7 +470,7 @@ console.log('Lowest precipitation value is: ' + myWeatherHistory.lowestPrecipita
 secondData = myWeatherHistory.convertToInternationalUnits();
 console.log('Data INTERNATIONAL units');
 console.log(secondData.latestTemperatureData());
-console.log(secondData.lowestPrecipitationValue());
+console.log('Lowest precipitation value is: ' + secondData.lowestPrecipitationValue());
 
 
 
