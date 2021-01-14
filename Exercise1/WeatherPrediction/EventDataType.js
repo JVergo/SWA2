@@ -19,10 +19,16 @@ class ImmutableEvent {
     getTime() { return this.time }
     toString() { return `Place: ${this.getPlace()}, Time - ${this.getTime()}` }
 }
-console.log("Event Test")
-var myEvent = new ImmutableEvent('Horsens');
+var myEvent = new ImmutableEvent('Horsens', null);
+console.log('TEST IMMUTABLE EVENT');
+console.log('Data Must Change');
 console.log(myEvent.toString());
-console.log()
+var secondEvent = myEvent.setPlace('USA');
+console.log(secondEvent.toString());
+console.log('Data Must Remain The Same');
+console.log(myEvent.toString());
+myEvent.time = new Date(11111).toLocaleString();
+console.log(myEvent.toString());
 
 class ImmutableDataType extends ImmutableEvent {
     constructor(_unit, _type, _place, _time) {
@@ -45,10 +51,18 @@ class ImmutableDataType extends ImmutableEvent {
 
     toString() { return `Unit: ${this.getUnit()}, Type: ${this.getType()}, Place: ${this.getPlace()}, Time: ${this.getTime()}` }
 }
-console.log("DataType Test")
-var myData = new ImmutableDataType('testsUnit1', 'testType1', 'testPlace1', null);
-console.log(myData.toString());
+var myDataType = new ImmutableDataType('testUnit', 'testType', 'testPlace', null);
 console.log()
+console.log('TEST IMMUTABLE DATA TYPE');
+console.log('Data Must Change');
+console.log(myDataType.toString());
+var secondData = myDataType.setUnit('UNIT_CHANGED');
+var thirdData = secondData.setType('TYPE_CHANGED');
+console.log(thirdData.toString());
+console.log('Data Must Remain The Same');
+console.log(myDataType.toString());
+myDataType.type = "MANUALLY FORCED TYPE";
+console.log(myDataType.toString());
 
 class WeatherPrediction extends ImmutableDataType
 { 
