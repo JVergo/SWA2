@@ -509,7 +509,7 @@
         let data = await fetch("http://localhost:8080/data/" + place);
         let forecast = await fetch("http://localhost:8080/forecast/" + place);
 
-        if (data.ok && forecast.ok) { // if HTTP-status is 200-299
+        if (data.ok && forecast.ok) { // if HTTP-status is 200-299 //the promise is here
           // get the response body (the method explained below)
           let dataJson = await data.json();
           let forecastJson = await forecast.json();
